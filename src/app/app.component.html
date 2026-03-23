@@ -1,0 +1,36 @@
+
+<div class="container">
+  <h1>💰 Controle de Gastos</h1>
+
+  <form (ngSubmit)="adicionarDespesa()" class="form">
+    <input type="text" placeholder="Descrição" [(ngModel)]="descricao" name="descricao" required>
+    <input type="number" placeholder="Valor" [(ngModel)]="valor" name="valor" required>
+    <input type="date" [(ngModel)]="data" name="data" title="Data da despesa" required>
+    <input type="text" placeholder="Categoria" [(ngModel)]="categoria" name="categoria" required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Data</th>
+        <th>Categoria</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let despesa of despesas">
+        <td>{{despesa.id}}</td>
+        <td>{{ despesa.descricao }}</td>
+        <td>R$ {{ despesa.valor | number:'1.2-2' }}</td>
+        <td>{{ despesa.data | date:'dd/MM/yyyy' }}</td>
+        <td>{{ despesa.categoria }}</td>
+        <td><button (click)="removerDespesa(despesa.id)">Excluir</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
