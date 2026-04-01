@@ -1,0 +1,46 @@
+<form [formGroup]="despesaForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    
+
+    <label for="descricao">Descrição:</label>
+    <input class="border"
+        id="descricao"
+        type="text"
+        placeholder="Descrição"
+        formControlName="descricao"
+        required>
+   
+
+    <label for="valor">Valor:</label>
+    <input class="border"
+       id="valor"
+       type="number" 
+       placeholder="Valor" 
+       formControlName="valor" 
+       required>
+    
+
+    <label for="data">Data:</label>
+    <input class="border"
+       id="data"
+       type="date" 
+       formControlName="data" 
+       title="Data da despesa" 
+       required>
+    
+
+    <label for="categoria">Categoria:</label>
+    <input class="border"
+        id="categoria"
+        type="text" 
+        placeholder="Digite a categoria (ex: agua, alimentos, salario)" 
+        formControlName="categoria" 
+        list="categoriasList"
+        required>
+    <datalist id="categoriasList">
+      <option *ngFor="let cat of sugestoesCategoria" [value]="cat"></option>
+    </datalist>
+    
+
+    <button class="border-2 bg-green-600 w-full h-full hover:bg-green-200 hover:transition hover:bg-green-700 cursor-pointer border-2 bg-gray-500 text-white px-4 py-2" type="submit" [disabled]="despesaForm.invalid">Adicionar</button>
+    <h1>Total Gasto: R$ {{ totalGasto | number:'1.2-2' }}</h1>
+  </form>

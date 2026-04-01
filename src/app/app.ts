@@ -4,15 +4,19 @@ import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { DespesaService } from './services/despesa.service';
 import { Despesa, TipoCategoriaClassificacao, MAPEAMENTO_CATEGORIAS } from './models/despesa.model';
 import { TituloComponent } from './components/titulo/titulo.component';
-import { CreditoInputComponent } from './components/credito-input/credito.component';
+import { CreditoInputComponent } from './components/component-despesa/credito-input/credito.component';
+import { ItemsInputComponent } from './components/component-despesa/items-input/items-input.component';
+import { ItemsTableComponent } from "./components/component-despesa/items-table/items-table.component";
+import { FiltrosComponent } from "./components/component-despesa/filtros/filtros.component";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ReactiveFormsModule, CommonModule, DecimalPipe, DatePipe, TituloComponent, CreditoInputComponent]
+  imports: [FormsModule, ReactiveFormsModule, CommonModule, DecimalPipe, TituloComponent, CreditoInputComponent, ItemsInputComponent, ItemsTableComponent, FiltrosComponent]
 })
+
 export class App {
   private readonly despesaService = inject(DespesaService);
 

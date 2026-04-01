@@ -1,0 +1,24 @@
+<table class="w-full border-collapse border border-gray-300">
+    <thead class="bg-yellow-100">
+      <tr>
+        <th>ID</th>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Data</th>
+        <th>Categoria</th>
+        <th>Classificação</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody class="bg-yellow-200">
+      <tr *ngFor="let despesa of despesasFiltradas">
+        <td>{{despesa.id}}</td>
+        <td>{{ despesa.descricao }}</td>
+        <td>R$ {{ despesa.valor | number:'1.2-2' }}</td>
+        <td>{{ despesa.data | date:'dd/MM/yyyy' }}</td>
+        <td>{{ despesa.categoria }}</td>
+        <td>{{ classificarCategoria(despesa.categoria) }}</td>
+        <td><button class="cursor-pointer bg-transparent border" (click)="removerDespesa.emit(despesa.id)">Excluir</button></td>
+      </tr>
+    </tbody>
+  </table>

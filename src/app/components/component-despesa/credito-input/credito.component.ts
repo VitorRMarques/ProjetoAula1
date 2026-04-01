@@ -3,7 +3,6 @@ import { Component, Input, Output, EventEmitter } from "@angular/core";
 @Component({
   selector: 'app-credito-input',
   templateUrl: './credito.component.html',
-  styleUrls: ['./credito.component.css'],
   standalone: true
 })
 export class CreditoInputComponent {
