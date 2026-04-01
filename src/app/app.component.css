@@ -1,8 +1,7 @@
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
+* {
+  margin: .5rem;
 }
+
 
 form {
   display: flex;
@@ -27,4 +26,17 @@ th, td {
 
 button {
   cursor: pointer;
+  width: 180px;
+  height: 60px;
+  background: transparent;
+  border: 1px solid #5de75d;
+  outline: none;
+  transition: 1s ease-in-out;
 }
+
+button:hover{
+  background-color: #2aaa64;
+  transition: .5s ease-in-out;
+}
+
+

@@ -1,68 +1,119 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { DespesaService } from './services/despesa.service';
-import { Despesa } from './despesa.model';
+import { Despesa, TipoCategoriaClassificacao, MAPEAMENTO_CATEGORIAS } from './models/despesa.model';
+import { TituloComponent } from './components/titulo/titulo.component';
+import { CreditoInputComponent } from './components/credito-input/credito.component';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, CommonModule, DecimalPipe, DatePipe],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, ReactiveFormsModule, CommonModule, DecimalPipe, DatePipe, TituloComponent, CreditoInputComponent]
 })
 export class App {
-  descricao = '';
-  valor: number | null = null;
-  data: string = '';
-  categoria = '';
-  searchCategoria = '';
-  totalPorCategoria = 0;
-  despesas: Despesa[] = [];
+  private readonly despesaService = inject(DespesaService);
 
-  constructor(private readonly despesaService: DespesaService) {
+  despesaForm = new FormGroup({
+    descricao: new FormControl('', Validators.required),
+    valor: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    data: new FormControl('', Validators.required),
+    categoria: new FormControl('', Validators.required)
+  });
+
+  despesas = signal<Despesa[]>([]);
+
+  credito = signal<number>(0);
+
+  filtroCategoria = signal<string>('');
+
+  filtroData = signal<string>('');
+
+  totalGasto = computed(() => this.despesaService.getTotal());
+
+  saldo = computed(() => this.credito() - this.totalGasto());
+
+  despesasFiltradas = computed(() => {
+    const filtroCat = this.filtroCategoria().trim().toLowerCase();
+    const filtroDt = this.filtroData().trim();
+    let filtered = this.despesas();
+
+    if (filtroCat) {
+      filtered = filtered.filter(despesa =>
+        despesa.categoria.toLowerCase().includes(filtroCat) ||
+        this.classificarCategoria(despesa.categoria).toLowerCase().includes(filtroCat)
+      );
+    }
+
+    if (filtroDt) {
+      const dataFiltro = new Date(filtroDt);
+      filtered = filtered.filter(despesa =>
+        despesa.data.toDateString() === dataFiltro.toDateString()
+      );
+    }
+
+    return filtered;
+  });
+
+  constructor() {
     this.carregarDespesas();
+    this.credito.set(this.despesaService.getCredito());
   }
 
-  carregarDespesas() {
-    this.despesas = this.despesaService.getDespesas();
+  carregarDespesas(): void {
+    this.despesas.set(this.despesaService.getDespesas());
   }
 
-  adicionarDespesa() {
-    if (!this.descricao || !this.valor || !this.data || !this.categoria) {
-      alert('Preencha todos os campos!');
+  adicionarDespesa(): void {
+    if (this.despesaForm.invalid) {
+      alert('Preencha todos os campos corretamente!');
       return;
     }
 
+    const formValue = this.despesaForm.value;
     const novaDespesa: Despesa = {
       id: Date.now(),
-      descricao: this.descricao,
-      valor: this.valor,
-      data: new Date(this.data),
-      categoria: this.categoria
+      descricao: formValue.descricao!.trim(),
+      valor: formValue.valor!,
+      data: new Date(formValue.data!),
+      categoria: formValue.categoria!.trim()
     };
 
     this.despesaService.addDespesa(novaDespesa);
-    this.limparFormulario();
+    this.despesaForm.reset();
     this.carregarDespesas();
   }
-
-  removerDespesa(id: number) {
+  
+  removerDespesa(id: number): void {
     this.despesaService.removeDespesa(id);
     this.carregarDespesas();
   }
 
-  buscarPorCategoria() {
-    this.totalPorCategoria = this.despesaService.getTotalPorCategoria(this.searchCategoria);
+  atualizarCredito(credito: number): void {
+    this.credito.set(credito);
+    this.despesaService.setCredito(credito);
   }
 
-  limparFormulario() {
-    this.descricao = '';
-    this.valor = null;
-    this.data = '';
-    this.categoria = '';
+  classificarCategoria(categoria: string): TipoCategoriaClassificacao {
+    return this.despesaService.classificarCategoria(categoria);
   }
 
-  get totalGasto(): number {
-    return this.despesaService.getTotal();
+  obterSugestoesCategoria(): string[] {
+    return Object.keys(MAPEAMENTO_CATEGORIAS).sort();
+  }
+
+  atualizarFiltroCategoria(filtro: string): void {
+    this.filtroCategoria.set(filtro);
+  }
+
+  atualizarFiltroData(filtro: string): void {
+    this.filtroData.set(filtro);
+  }
+
+  limparFiltro(): void {
+    this.filtroCategoria.set('');
+    this.filtroData.set('');
   }
 }

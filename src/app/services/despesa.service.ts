@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Despesa } from '../despesa.model';
+import { Despesa, TipoCategoriaClassificacao, MAPEAMENTO_CATEGORIAS } from '../models/despesa.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DespesaService {
   private readonly storageKey = 'despesas';
+  private readonly creditoKey = 'credito';
 
   constructor() {}
 
@@ -33,6 +34,17 @@ export class DespesaService {
     return this.getDespesas().reduce((sum, d) => sum + d.valor, 0);
   }
 
+  // Retorna o crédito
+  getCredito(): number {
+    const data = localStorage.getItem(this.creditoKey);
+    return data ? parseFloat(data) : 0;
+  }
+
+  // Define o crédito
+  setCredito(credito: number): void {
+    localStorage.setItem(this.creditoKey, credito.toString());
+  }
+
   // Calcula o total gasto para categoria especificada (case-insensitive)
   getTotalPorCategoria(categoria: string): number {
     const cat = categoria.trim().toLowerCase();
@@ -42,5 +54,11 @@ export class DespesaService {
     return this.getDespesas()
       .filter(d => d.categoria.trim().toLowerCase() === cat)
       .reduce((sum, d) => sum + d.valor, 0);
+  }
+
+  // Classifica uma categoria baseado no mapeamento
+  classificarCategoria(categoria: string): TipoCategoriaClassificacao {
+    const catLower = categoria.trim().toLowerCase();
+    return MAPEAMENTO_CATEGORIAS[catLower] || 'Materiais';
   }
 }
